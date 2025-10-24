@@ -9,27 +9,32 @@ import numpy as np
 import cv2
 
 # Print keyboard usage
-print("This is a HSV color detection demo. Use the keys to adjust the \
-selection color in HSV space. Circle in bottom left.")
-print("The masked image shows only the pixels with the given HSV color within \
-a given range.")
-print("Use h/H to de-/increase the hue.")
-print("Use s/S to de-/increase the saturation.")
-print("Use v/V to de-/increase the (brightness) value.\n")
-print("Double-click an image pixel to select its color for masking.")
+# NOTE: Had to change input mapping due to Linux-specific issue where key case is not detected.
+string: str = """
+This is a HSV color detection demo. Use the keys to adjust the selection color in HSV space. Circle in bottom left.
+The masked image shows only the pixels with the given HSV color within a given range.
+Use g/h to de-/increase the hue.
+Use a/s to de-/increase the saturation.
+Use c/v to de-/increase the (brightness) value.
+
+Double-click an image pixel to select its color for masking.
+"""
 
 # Capture webcam image
-cap = cv2.VideoCapture(0)
+cap: cv2.VideoCapture = cv2.VideoCapture(0)
 
 # Get camera image parameters from get()
-width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-codec = int(cap.get(cv2.CAP_PROP_CODEC_PIXEL_FORMAT))
+width: int = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+height: int = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+codec: int = int(cap.get(cv2.CAP_PROP_CODEC_PIXEL_FORMAT))
 
-print("Video properties:")
-print("  Width = " + str(width))
-print("  Height = " + str(height))
-print("  Codec = " + str(codec))
+string += f"""
+Video properties:
+Width: {width}
+Height: {height}
+Codec: {codec}
+"""
+print(string)
 
 # Drawing helper variables
 thick = 10
@@ -40,18 +45,18 @@ font_size_small = 1
 font_size_smaller = 0.6
 font = cv2.FONT_HERSHEY_SIMPLEX
 
-# TODO Define  RGB colors as variables
+blue: tuple = (255, 0, 0)
+green: tuple = (0, 255, 0)
+red: tuple = (0, 0, 255)
 
 # Exemplary color conversion (only for the class), tests usage of cv2.cvtColor
-
-# TODO Enter some default values and uncomment
-# hue =
+hue = 120
 hue_range = 10
-# saturation =
+saturation = 20
 saturation_range = 100
-# value =
+value = 60
 value_range = 100
-
+cv2.namedWindow("Original", cv2.WINDOW_AUTOSIZE)
 
 # Callback to pick the color on double click
 def color_picker(event, x, y, flags, param):
@@ -67,31 +72,48 @@ def color_picker(event, x, y, flags, param):
 while True:
     # Get video frame (always BGR format!)
     ret, frame = cap.read()
-    if ret:
-        # Copy image to draw on
-        img = frame.copy()
-
-        # TODO Compute color ranges for display
-
-        # TODO Draw selection color circle and text for HSV values
-
-        # TODO Convert to HSV
-        hsv = "TODO: replace this with the conversion code"
-
-        # TODO Create a bitwise mask
-
-        # TODO Apply mask
-
-        # TODO Show the original image with drawings in one window
-
-        # TODO Show the masked image in another window
-
-        # TODO Show the mask image in another window
-
-        # TODO Deal with keyboard input
-
-    else:
+    if not ret:
         print("Could not start video camera")
+        break
+
+    # Copy image to draw on
+    img = frame.copy()
+
+    # Compute color ranges for display
+    min: np.ndarray = np.array([
+        hue - hue_range, saturation - saturation_range, value - value_range
+    ])
+    max: np.ndarray = np.array([
+        hue + hue_range, saturation + saturation_range, value + value_range
+    ])
+
+    # TODO Draw selection color circle and text for HSV values
+    img = cv2.circle(img, (100, 40), thick, blue, -1)
+    img = cv2.putText(img, f"H: {hue}", (10, 20), font, font_size_smaller, blue, thinner)
+    img = cv2.putText(img, f"S: {saturation}", (10, 40), font, font_size_smaller, blue, thinner)
+    img = cv2.putText(img, f"V: {value}", (10, 60), font, font_size_smaller, blue, thinner)
+
+    hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
+
+    # TODO Create a bitwise mask
+
+    # TODO Apply mask
+
+    cv2.imshow("Original", img)
+
+    # TODO Show the masked image in another window
+
+    # TODO Show the mask image in another window
+
+    # User Input
+    key: int = cv2.waitKey(10)
+    if key == ord("g") or key == ord("h"):
+        hue += 1 if key == ord("h") else -1
+    if key == ord("s") or key == ord("S"):
+        saturation += 1 if key == ord("s") else -1
+    if key == ord("v") or key == ord("V"):
+        value += 1 if key == ord("v") else -1
+    if key == ord("q") or key == ord("Q"):
         break
 
 cap.release()
