@@ -8,7 +8,6 @@
 import numpy as np
 import cv2
 
-# Print keyboard usage
 # NOTE: Had to change input mapping due to Linux-specific issue where key case is not detected.
 string: str = """
 This is a HSV color detection demo. Use the keys to adjust the selection color in HSV space. Circle in bottom left.
@@ -56,17 +55,22 @@ saturation = 20
 saturation_range = 100
 value = 60
 value_range = 100
-cv2.namedWindow("Original", cv2.WINDOW_AUTOSIZE)
 
 # Callback to pick the color on double click
 def color_picker(event, x, y, flags, param):
     global hue, saturation, value
-    if event == cv2.EVENT_LBUTTONDBLCLK:
+    if event == cv2.EVENT_LBUTTONDBLCLK or event == 4:
         (h, s, v) = hsv[y, x]
         hue = int(h)
         saturation = int(s)
         value = int(v)
         print("New color selected:", (hue, saturation, value))
+
+
+cv2.namedWindow("Original", cv2.WINDOW_AUTOSIZE)
+cv2.namedWindow("Mask", cv2.WINDOW_AUTOSIZE)
+cv2.namedWindow("Result", cv2.WINDOW_AUTOSIZE)
+cv2.setMouseCallback("Original", color_picker)
 
 
 while True:
@@ -76,7 +80,6 @@ while True:
         print("Could not start video camera")
         break
 
-    # Copy image to draw on
     img = frame.copy()
 
     # Compute color ranges for display
@@ -87,33 +90,35 @@ while True:
         hue + hue_range, saturation + saturation_range, value + value_range
     ])
 
-    # TODO Draw selection color circle and text for HSV values
-    img = cv2.circle(img, (100, 40), thick, blue, -1)
+    # Draw selection color circle and text for HSV values
+    HSV_one_pixel_img = np.zeros((1, 1, 3), np.uint8)
+    HSV_one_pixel_img[0, 0] = (hue, saturation, value)
+    selection_bgr_array = cv2.cvtColor(HSV_one_pixel_img, cv2.COLOR_HSV2BGR)[0, 0]
+    selection_BGR = (int(selection_bgr_array[0]), int(selection_bgr_array[1]), int(selection_bgr_array[2]))
+
+    # Mask and result
+    hsv: cv2.UMat = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    mask: cv2.UMat = cv2.inRange(hsv, min, max)
+    result: cv2.UMat = cv2.bitwise_and(img, img, mask=mask)
+
+    img = cv2.circle(img, (100, 40), thick, selection_BGR, -1)
     img = cv2.putText(img, f"H: {hue}", (10, 20), font, font_size_smaller, blue, thinner)
     img = cv2.putText(img, f"S: {saturation}", (10, 40), font, font_size_smaller, blue, thinner)
     img = cv2.putText(img, f"V: {value}", (10, 60), font, font_size_smaller, blue, thinner)
 
-    hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
-
-    # TODO Create a bitwise mask
-
-    # TODO Apply mask
-
     cv2.imshow("Original", img)
-
-    # TODO Show the masked image in another window
-
-    # TODO Show the mask image in another window
+    cv2.imshow("Result", result)
+    cv2.imshow("Mask", mask)
 
     # User Input
     key: int = cv2.waitKey(10)
     if key == ord("g") or key == ord("h"):
         hue += 1 if key == ord("h") else -1
-    if key == ord("s") or key == ord("S"):
+    if key == ord("a") or key == ord("s"):
         saturation += 1 if key == ord("s") else -1
-    if key == ord("v") or key == ord("V"):
+    if key == ord("c") or key == ord("v"):
         value += 1 if key == ord("v") else -1
-    if key == ord("q") or key == ord("Q"):
+    if key == ord("q"):
         break
 
 cap.release()
