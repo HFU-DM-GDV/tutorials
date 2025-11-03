@@ -8,6 +8,7 @@ import numpy as np
 import time
 
 
+
 def convolution_with_opencv(image, kernel):
     # Flip the kernel as opencv filter2D function is
     # a correlation not a convolution

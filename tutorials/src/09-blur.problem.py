@@ -8,17 +8,20 @@ import numpy as np
 import time
 
 
-# TODO Implement the convolution with opencv
+
+# Implement the convolution with opencv
 def convolution_with_opencv(image, kernel):
     # Flip the kernel as opencv filter2D function is a
     # correlation not a convolution
-
+    kernel = cv2.flip(kernel, -1)
     # When ddepth=-1, the output image will have the same depth as the source.
-
+    ddepth = -1 
     # Run filtering
 
+    output = cv2.filter2D(image, ddepth, kernel)
+    
     # Return result
-    return
+    return output
 
 
 def show_kernel(kernel):
@@ -58,31 +61,32 @@ image = cv2.imread(image_name, cv2.IMREAD_GRAYSCALE)
 # check if image is loaded fine
 if image is None:
     raise Exception("Could not read the image.")
-# image = cv2.resize(image, (320,213))
 
-# TODO Define kernel size
-kernel_size = "TODO: define this variable"
+#image = cv2.resize(image, (2160,4096))
 
-# TODO Define Gaussian standard deviation (sigma). If it is non-positive,
+#  Define kernel size
+kernel_size = 3
+
+
+#  Define Gaussian standard deviation (sigma). If it is non-positive,
 # It is computed from kernel_size as
-# sigma = 0.3*((ksize-1)*0.5 - 1) + 0.8
-sigma = "TODO: define this variable"
+sigma = 0.3*((kernel_size-1)*0.5 - 1) + 0.8
 
-# TODO Define the kernel using OpenCV with getGaussianKernel and create 2D kernel from it
-kernel = "TODO: define this variable"
-
+# Define the kernel using OpenCV with getGaussianKernel and create 2D kernel from it
+kernel_1D = cv2.getGaussianKernel(kernel_size, sigma)
+kernel = np.transpose(kernel_1D) * kernel_1D
 # Visualize the kernel
 show_kernel(kernel)
 
-# TODO Run convolution and measure the time it takes using the time module 
+# Run convolution and measure the time it takes using the time module 
 # (see https://www.w3schools.com/python/ref_module_time.asp for reference)
 # Start time to calculate computation duration
-start = "TODO: define this variable"
+start = time.time()
 # Run the convolution and write the resulting image into the result variable
-result = "TODO: define this variable"
+result = convolution_with_opencv(image, kernel)
 
 # End time after computation
-end = "TODO: define this variable"
+end = time.time()
 
 # Print timing results
 print(
@@ -102,5 +106,6 @@ print(
 # Show the original and the resulting image
 show_resulting_images(image, result)
 
-# TODO Find out how fast your computer can compute the convolution! What is the largest kernel size
+# Find out how fast your computer can compute the convolution! What is the largest kernel size
 # you can use while still getting results in under one second for a 4K UHD image?
+#3000 is the largest kernel size my laptop can compute under 1 second on an 4K image
