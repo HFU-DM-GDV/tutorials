@@ -11,7 +11,7 @@ import time
 # TODO Implement the convolution with opencv
 def convolution_with_opencv(image, kernel):
     # Flip the kernel as opencv filter2D function is a
-    # Correlation not a convolution
+    # correlation not a convolution
 
     # When ddepth=-1, the output image will have the same depth as the source.
 
@@ -26,11 +26,11 @@ def show_kernel(kernel):
     # Note that window parameters have no effect on MacOS
     title_kernel = "Kernel"
     cv2.namedWindow(title_kernel, cv2.WINDOW_NORMAL)
-    cv2.resizeWindow(title_kernel, 300, 300)
 
     # Scale kernel to make it visually more appealing
     kernel_img = cv2.normalize(kernel, kernel, 0, 255, cv2.NORM_MINMAX, cv2.CV_8UC1)
     cv2.imshow(title_kernel, kernel_img)
+    cv2.resizeWindow(title_kernel, 300, 300)
     cv2.waitKey(0)
 
 
@@ -55,10 +55,10 @@ def show_resulting_images(image, result):
 # Load the image.
 image_name = "./tutorials/data/images/Bumbu_Rawon.jpg"
 image = cv2.imread(image_name, cv2.IMREAD_GRAYSCALE)
+# check if image is loaded fine
+if image is None:
+    raise Exception("Could not read the image.")
 # image = cv2.resize(image, (320,213))
-
-# TODO Define kernel
-kernel = "TODO: define this variable"
 
 # TODO Define kernel size
 kernel_size = "TODO: define this variable"
@@ -68,12 +68,14 @@ kernel_size = "TODO: define this variable"
 # sigma = 0.3*((ksize-1)*0.5 - 1) + 0.8
 sigma = "TODO: define this variable"
 
-# TODO Create the kernel with OpenCV
+# TODO Define the kernel using OpenCV with getGaussianKernel and create 2D kernel from it
+kernel = "TODO: define this variable"
 
 # Visualize the kernel
 show_kernel(kernel)
 
-# TODO Run convolution and measure the time it takes
+# TODO Run convolution and measure the time it takes using the time module 
+# (see https://www.w3schools.com/python/ref_module_time.asp for reference)
 # Start time to calculate computation duration
 start = "TODO: define this variable"
 # Run the convolution and write the resulting image into the result variable
@@ -99,3 +101,6 @@ print(
 
 # Show the original and the resulting image
 show_resulting_images(image, result)
+
+# TODO Find out how fast your computer can compute the convolution! What is the largest kernel size
+# you can use while still getting results in under one second for a 4K UHD image?

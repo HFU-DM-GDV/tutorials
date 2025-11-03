@@ -23,17 +23,20 @@ def show_kernel(kernel):
     # Note that window parameters have no effect on MacOS
     title_kernel = "Kernel"
     cv2.namedWindow(title_kernel, cv2.WINDOW_NORMAL)
-    cv2.resizeWindow(title_kernel, 300, 300)
 
     # Scale kernel to make it visually more appealing
     kernel_img = cv2.normalize(kernel, kernel, 0, 255, cv2.NORM_MINMAX, cv2.CV_8UC1)
     cv2.imshow(title_kernel, kernel_img)
+    cv2.resizeWindow(title_kernel, 300, 300)
     cv2.waitKey(0)
 
 
 # Load the image.
 image_name = "./tutorials/data/images/Bumbu_Rawon.jpg"
 image = cv2.imread(image_name, cv2.IMREAD_GRAYSCALE)
+# check if image is loaded fine
+if image is None:
+    raise Exception("Could not read the image.")
 # image = cv2.resize(image, (320,213))
 
 # Define kernel

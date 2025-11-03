@@ -68,6 +68,9 @@ def main():
     # Load the image.
     image_name = "./tutorials/data/images/Bumbu_Rawon.jpg"
     image = cv2.imread(image_name, cv2.IMREAD_GRAYSCALE)
+    # check if image is loaded fine
+    if image is None:
+        raise Exception("Could not read the image.")
     # image = cv2.resize(image, (320,213))
 
     # Define kernel

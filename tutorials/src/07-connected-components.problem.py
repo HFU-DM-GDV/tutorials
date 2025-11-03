@@ -24,6 +24,9 @@ upper_green = np.array(
 
 # Load image
 img = cv2.imread("./tutorials/data/images/smarties01.JPG", cv2.IMREAD_COLOR)
+# Check if image is loaded fine
+if img is None:
+    raise Exception("Could not read image")
 img = cv2.resize(img, (800, 600))
 
 # Convert to HSV
@@ -34,8 +37,11 @@ mask = cv2.inRange(hsv, lower_green, upper_green)
 
 # TODO Modify the mask image with dilation or erosion 
 # in order to avoid very small connected components
+# See https://docs.opencv.org/master/db/df6/tutorial_erosion_dilatation.html
+# for morphological operations in OpenCV
 
-# TODO Find connected components
+# TODO Find connected components, see 
+# https://docs.opencv.org/4.x/d3/dc0/group__imgproc__shape.html#ga107a78bf7cd25dec05fb4dfc5c9e765f for documentation
 
 # TODO Loop over all (reasonable) found connected components
 
