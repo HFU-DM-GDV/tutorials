@@ -4,6 +4,8 @@
 # Counting colored objects by finding connected components in the binary image. Modify the binary image to improve the
 # results.
 
+from calendar import c
+from turtle import lt
 import cv2
 import numpy as np
 
@@ -20,6 +22,9 @@ upper_green = np.array([hue + hue_range, saturation + saturation_range, value + 
 
 # Load image
 img = cv2.imread("./tutorials/data/images/smarties02.JPG", cv2.IMREAD_COLOR)
+# Check if image is loaded fine
+if img is None:
+    raise Exception("Could not read image")
 img = cv2.resize(img, (800, 600))
 
 # Convert to HSV
@@ -78,7 +83,7 @@ mask = closing(mask, kernel_size, kernel_shape)
 
 # Find connected components
 connectivity = 8
-(numLabels, labels, stats, centroids) = cv2.connectedComponentsWithStats(mask, connectivity, cv2.CV_32S)
+(numLabels, labels, stats, centroids) = cv2.connectedComponentsWithStats(mask, connectivity=connectivity, ltype=cv2.CV_32S)
 
 # Helper variables for drawing and candidate rejection
 red_BGR = (0, 0, 255)
@@ -126,8 +131,6 @@ print("We have found", str(numLabels - numRejected), "green smarties.")
 
 # Show the original image with drawings in one window
 cv2.imshow("Original image", img)
-
-# Show the masked image in another window
 
 # Show the mask image in another window
 cv2.imshow("Mask image", mask)
